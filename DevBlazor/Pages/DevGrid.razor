@@ -1,0 +1,82 @@
+﻿@page "/grid"
+@inject HttpClient Http
+
+@if (DataSource == null)
+{
+    <div>Loading...</div>
+}
+
+
+<DxDataGrid Data="@DataSource" name="dxgrid">
+
+    <DxDataGridDateEditColumn Field=@nameof(TimeTable.Date) />
+    <DxDataGridColumn Field=@nameof(TimeTable.Program) Caption="강좌명" />
+    <DxDataGridColumn Field=@nameof(TimeTable.Coach) Caption="강사" />
+    <DxDataGridColumn Field=@nameof(TimeTable.Date) Caption="시간" />
+    <DxDataGridColumn Field=@nameof(TimeTable.State) Caption="예약가능">
+        <DisplayTemplate>
+            @{
+
+                var timeTable = context as TimeTable;
+                int programstate = (int)timeTable.State;
+                bool reservationstate = timeTable.Reservation;
+                string ReservationPossible = "";
+                if (reservationstate == false) //예약가능
+                {
+                    if (programstate == 0)
+                    {
+                        <button type="submit" @onclick="(() => Save(timeTable))">즉시예약</button>
+                    }
+                    if (programstate == 1)
+                    {
+                        <button type="submit" @onclick="(() => Save(timeTable))">대기예약</button>
+                    }
+
+                }
+
+
+            }
+        </DisplayTemplate>
+
+
+    </DxDataGridColumn>
+    <DxDataGridColumn Field=@nameof(TimeTable.Reservation) Caption="예약" />
+</DxDataGrid>
+<div class="target-container" @onclick="@(()=>PopupVisible=true)">click here to popup</div>
+<DxPopup HeaderText="예약확인" @bind-Visible="@PopupVisible">
+    <div>
+        <content>
+            예약하시겠습니까?
+        </content>
+        <button type="button" @onclick=@(()=>popupdate())>확인</button>
+        <button type="button" @onclick=@(()=>popcancel())>취소</button>
+    </div>
+</DxPopup>
+
+
+
+@code {
+    private List<TimeTable> DataSource;
+    bool PopupVisible { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        DataSource = TimetableCollection.GetTimetable();
+    }
+
+    private async Task Save(TimeTable item)
+    {
+
+        PopupVisible = true;
+
+
+    }
+    void popupdate()
+    {
+
+    }
+    void popcancel()
+    {
+
+    }
+}
